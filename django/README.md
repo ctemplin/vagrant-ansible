@@ -10,7 +10,7 @@ After cloning the repo follow these steps:
 
 ###Setting Custom Variables
 
-As much as possible custom variable definitions should be constrained to `vagrant.rb` and passed to Ansible in the `site.yml` file. Read the comments in the [VagrantConsts module](/vagrant/vagrant.rb) for more information.
+As much as possible custom variable definitions should be constrained to `vagrant.rb` and passed to Ansible in the `site.yml` file. Read the comments in the [VagrantConsts module](/django/vagrant/vagrant.rb) for more information.
 
 ####Provisioning
 
