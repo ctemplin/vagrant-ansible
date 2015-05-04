@@ -1,0 +1,17 @@
+---
+
+# PROJECT NAME HERE
+# Tested on Ubuntu 14.04 LTS
+
+# REQUIREMENTS: Ansible 1.5.3+
+
+
+- name: Playbook Name
+  hosts: all
+  user: root
+  vars:
+    default_django_app_dirname: "{{ default_django_app_dirname }}"
+  roles:
+    - { role: common, tags: ["common", "vagrant"] }
+    - { role: django, tags: ["django"] }
+

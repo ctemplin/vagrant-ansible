@@ -1,0 +1,76 @@
+---
+- name: Make sure we have correct apt repos installed
+  copy: src=sources.list dest=/etc/apt/sources.list
+  when: vagrantvm is not defined
+
+- name: Make sure we have correct apt repos installed for vagrant
+  copy: src=vagrant_sources.list dest=/etc/apt/sources.list
+  when: vagrantvm is defined
+
+- name: apt-get update
+  apt: update_cache=yes cache_valid_time=86400 # 24 hours
+
+- name: Install ansible apt deps
+  apt: name={{ item }} state=installed
+  with_items:
+    - python-apt
+    - aptitude
+
+- name: apt-get upgrade
+  apt: upgrade=yes cache_valid_time=86400 # 24 hours
+
+- name: Install common deps
+  apt: name={{ item }} state=installed
+  with_items:
+    - build-essential
+    - git
+    - vim
+    - htop
+    - python-pycurl
+    - ack-grep
+    - dnsutils
+    - wget
+    - openjdk-6-jre
+    - ca-certificates
+    - python-passlib
+    - libpq-dev
+    - python-dev
+    - python-psycopg2
+    - curl
+    - unzip
+    - memcached
+    # - ruby
+    # - rubygems
+    - locales
+
+- name: make sure correct locales are installed
+  copy: src=locale dest=/etc/default/locale
+
+- name: make sure correct locale.alias are installed
+  copy: src=locale.alias dest=/etc/locale.alias
+
+- name: reconfigure locales
+  shell: locale-gen en_US.UTF-8 && update-locale en_US.UTF-8
+
+- name: Install PIL reqs
+  apt: name={{ item }} state=installed
+  with_items:
+    - libjpeg8-dev
+    - zlib1g-dev
+    - libtiff4-dev
+    - libfreetype6-dev
+    - liblcms2-dev
+    - libwebp-dev
+    - libtk-img-dev
+
+- name: Create PIL Ubuntu symlink for zlib support
+  file: src=/usr/lib/i386-linux-gnu/libz.so dest=/usr/lib/libz.so state=link
+
+- name: Make sure we have some missing locales
+  shell: locale-gen {{ item }}
+  with_items:
+      - en_US.UTF-8
+      - en_GB.UTF-8
+      - ru_UA.UTF-8
+
+- include: swap.yml tags=swap

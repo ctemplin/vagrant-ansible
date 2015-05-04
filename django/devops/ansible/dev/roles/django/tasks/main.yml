@@ -1,0 +1,55 @@
+---
+- name: Install Zip
+  apt: pkg=zip state=installed
+  tags: ["vagrant"]
+
+- name: Install Pip
+  apt: pkg=python-pip state=installed
+  tags: ["vagrant"]
+
+- name: Install Virtualenv
+  apt: pkg=python-virtualenv state=installed
+  tags: ["vagrant"]
+
+- name: Create empty Virtualenv for vagrant
+  command: virtualenv /home/vagrant/env
+  sudo: no
+  tags: ["vagrant"]
+  when: vagrantvm is defined
+
+- name: Install pip requirements into Virtualenv
+  tags: ["vagrant"]
+  pip: >
+    virtualenv='/home/vagrant/env'
+    requirements='/home/vagrant/app/requirements.txt'
+  when: vagrantvm is defined
+
+- name: Make sure the vagrant user is part of www-data group
+  user: name=vagrant groups=www-data append=yes
+  tags:  ["vagrant"]
+  when: vagrantvm is defined
+
+- name: Check if manage.py already exists
+  stat: path=/home/vagrant/app/manage.py
+  register: manage_py
+
+- name: Start Django project
+  shell: chdir=/home/vagrant /home/vagrant/env/bin/python /home/vagrant/env/bin/django-admin.py startproject {{ default_django_app_dirname }} app
+  tags: ["vagrant"]
+  when: vagrantvm is defined and manage_py.stat.exists == False
+
+- name: Run python manage.py syncdb
+  shell: chdir=/home/vagrant/app /home/vagrant/env/bin/python manage.py syncdb --noinput
+  tags:  ["vagrant"]
+  when: vagrantvm is defined
+
+- name: Run migrations
+  shell: chdir=/home/vagrant/app /home/vagrant/env/bin/python manage.py migrate --noinput
+  tags:  ["vagrant"]
+  when: vagrantvm is defined
+
+- name: Run Django server in background
+  shell: ( ( nohup chdir=/home/vagrant/app /home/vagrant/env/bin/python manage.py runserver 0.0.0.0:8000 1>/dev/null 2>&1 ) & )
+  # Detached syntax from http://superuser.com/questions/870871/run-a-remote-script-application-in-detached-mode-in-ansible
+  tags: ["vagrant"]
+  when: vagrantvm is defined
