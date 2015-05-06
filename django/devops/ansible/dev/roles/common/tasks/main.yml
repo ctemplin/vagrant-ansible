@@ -36,6 +36,7 @@
     - libpq-dev
     - python-dev
     - python-psycopg2
+    - sqlite3
     - curl
     - unzip
     - memcached
