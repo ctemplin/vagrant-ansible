@@ -43,6 +43,40 @@
   tags: ["vagrant"]
   when: vagrantvm is defined and manage_py.stat.exists == False
 
+- name: Check if temp settings.py already exists
+  stat: path=/tmp/{{ default_django_app_dirname }}_settings.py
+  register: tmp_settings
+  tags: ["templates"]
+
+- name: Create Django settings file from template
+  template: dest=/home/vagrant/app/_{{ default_django_app_dirname }}_settings.py src=../templates/settings.py.j2
+  # when: tmp_settings.stat.exists == False
+  tags: ["templates"]
+
+- name: Backup old settings and copy over the template-generated one
+  shell: >
+    chdir=/home/vagrant/app/{{ default_django_app_dirname }}
+    mv settings.py settings.py.bak && mv ../_{{ default_django_app_dirname }}_settings.py settings.py
+  # when: tmp_settings.stat.exists == False
+  tags: ["templates"]
+
+- name: Check if temp urls.py already exists
+  stat: path=/home/vagrant/app/{{ default_django_app_dirname }}/urls.py.bak
+  register: urls_bak
+  tags: ["templates"]
+
+- name: Create Django urls file from template
+  template: dest=/home/vagrant/app/_{{ default_django_app_dirname }}_urls.py src=../templates/urls.py.j2
+  # when: urls_bak.stat.exists == False
+  tags: ["templates"]
+
+- name: Backup old urls and copy over the template-generated one
+  shell: >
+    chdir=/home/vagrant/app/{{ default_django_app_dirname }}
+    mv urls.py urls.py.bak && mv ../_{{ default_django_app_dirname }}_urls.py urls.py
+  # when: urls_bak.stat.exists == False
+  tags: ["templates"]
+
 - name: Run python manage.py syncdb
   shell: chdir=/home/vagrant/app /home/vagrant/env/bin/python manage.py syncdb --noinput
   tags:  ["vagrant"]

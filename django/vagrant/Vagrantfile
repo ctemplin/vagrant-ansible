@@ -92,6 +92,7 @@ Vagrant.configure(2) do |config|
         ansible_ssh_user: 'vagrant',
         vagrantvm: true,
         default_django_app_dirname: DEFAULT_DJANGO_APP_DIRNAME,
+        http_port: PORT,
         ssl_key: "not_required",
         ca_bundle: "not_required",
         ssl_cert: "not_required",
