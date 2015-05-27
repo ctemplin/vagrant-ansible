@@ -34,7 +34,12 @@
   register: manage_py
 
 - name: Start Django project
-  shell: chdir=/home/vagrant /home/vagrant/env/bin/python /home/vagrant/env/bin/django-admin.py startproject {{ default_django_app_dirname }} app
+  shell: >
+    chdir=/home/vagrant
+    /home/vagrant/env/bin/python
+    /home/vagrant/env/bin/django-admin.py
+    startproject
+    -- {{ default_django_app_dirname }} app
   tags: ["vagrant"]
   when: vagrantvm is defined and manage_py.stat.exists == False
 
