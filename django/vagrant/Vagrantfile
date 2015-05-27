@@ -1,6 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-require_relative './vagrant.rb'
+
+# If this file is a symlink, use the link path (not the target path)
+# to relatively import vagrant.rb.
+THIS_FILE = File.symlink?(__FILE__) ? __FILE__ : File.readlink(__FILE__)
+require File.join(File.dirname(THIS_FILE), "vagrant.rb")
+
 include VagrantConsts
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
